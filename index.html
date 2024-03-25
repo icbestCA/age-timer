@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  input[type="date"] {
+    margin-top: 10%;
+    padding: 10px;
+    font-size: 20px; /* Change this to adjust the size */
+    border: none;
+    background-color: #fff;
+  }
+  #result {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    font-size: 60px; /* Change this to adjust the size */
+    text-align: left;
+  }
+  .age {
+    font-size: 24px; /* Change this to adjust the size */
+  }
+  .big {
+    font-size: 60px; /* Change this to adjust the size */
+  }
+  .small {
+    font-size: 30px; /* Change this to adjust the size */
+  }
+  .info {
+    font-size: 18px;
+    margin-bottom: 8%;
+  }
+</style>
+</head>
+<body>
+<input id="inputDate" type="date" onchange="calculateMillisecondsPassed()">
+<div id="result"></div>
+<div id="info"></div>
+
+<script>
+  // Load the date from localStorage
+  document.getElementById("inputDate").value = localStorage.getItem("inputDate");
+  
+  function calculateMillisecondsPassed() {
+    var inputDate = new Date(document.getElementById("inputDate").value);
+    var currentDate = new Date();
+    var dateStringWithoutTimeZone = currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    // Save the date to localStorage
+    localStorage.setItem("inputDate", document.getElementById("inputDate").value);
+
+    var millisecondsPassed = currentDate - inputDate;
+    var millisecondsday = 86400000;
+
+    var leapYearsSinceDate = 0;
+
+    // Check if the input date is before February 29th
+    if (inputDate.getMonth() < 1 || (inputDate.getMonth() === 1 && inputDate.getDate() < 29)) {
+      for (var year = inputDate.getFullYear(); year <= currentDate.getFullYear(); year++) {
+        if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
+          leapYearsSinceDate++;
+        }
+      }
+    } else {
+      // If the input date is after February 29th, we need to adjust the year for leap year calculation
+      for (var year = inputDate.getFullYear() + 1; year <= currentDate.getFullYear(); year++) {
+        if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
+          leapYearsSinceDate++;
+        }
+      }
+    }
+
+    var millisecondstot = (millisecondsPassed - (millisecondsday * leapYearsSinceDate));
+    var years = (millisecondstot / (1000 * 60 * 60 * 24 * 365));
+    var yearsSplit = years.toFixed(9).split(".");
+
+    document.getElementById("result").innerHTML = "<span class='age'>Age: </span>" + "<div><span class='big'>" + yearsSplit[0] + "</span><span class='small'>." + yearsSplit[1] + "</span></div>";
+    document.getElementById("info").innerHTML = "<span class='info'>Time based on: " + dateStringWithoutTimeZone + "<br>Leap years counted: " + leapYearsSinceDate + "</span>";
+    requestAnimationFrame(calculateMillisecondsPassed);
+  }
+
+  // Call calculateMillisecondsPassed every second
+  setInterval(calculateMillisecondsPassed, 500);
+</script>
+</body>
+</html>
