@@ -66,6 +66,7 @@
     var millisecondsday = 86400000;
 
     var leapYearsSinceDate = 0;
+    var timezoneOffset = currentDate.getTimezoneOffset() * 60000;
 
     // Check if the input date is before February 29th
     if (inputDate.getMonth() < 1 || (inputDate.getMonth() === 1 && inputDate.getDate() < 29)) {
@@ -83,7 +84,7 @@
       }
     }
 
-    var millisecondstot = (millisecondsPassed - (millisecondsday * leapYearsSinceDate));
+    var millisecondstot = (millisecondsPassed - (millisecondsday * leapYearsSinceDate) - timezoneOffset);
     var years = (millisecondstot / (1000 * 60 * 60 * 24 * 365));
     var yearsSplit = years.toFixed(9).split(".");
 
